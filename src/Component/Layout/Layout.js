@@ -9,6 +9,7 @@ import Meeting from '../Meeting/Meeting';
 import Payment from '../Payment/Payment';
 import Project from '../Project/Project';
 import ProjectEmployees from '../Project/ProjectEmployees.js';
+import ProjectDetails from '../ProjectDetails/ProjectDetails.js';
 
 const Layout = () => {
     return (
@@ -24,6 +25,7 @@ const Layout = () => {
                     <Route path="/payment" element={<Payment />} />
                     <Route path="/project" element={<Project />} />
                     <Route path="/projectEmployees" element={<ProjectEmployees />} />
+                    <Route path="/projectDetails/:projectId?" element={<ProjectDetails />}/>
                 </Routes>
             </div>
         </div>

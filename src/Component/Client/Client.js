@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
@@ -9,6 +10,7 @@ const Client = () => {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [getAllClientList, setGetAllClientList] = useState([]);
   const [addUpdateClient, setAddUpdateClient] = useState({
     clientId: 0,
@@ -50,6 +52,7 @@ const Client = () => {
     setErrors((prevErrors) => ({ ...prevErrors, [key]: "" }));
   };
   const getAllClient = async () => {
+    setIsLoading(true);
     try {
       const result = await axios.get(
         "https://freeapi.gerasim.in/api/ClientStrive/GetAllClients",
@@ -60,6 +63,7 @@ const Client = () => {
         }
       );
       setGetAllClientList(result.data.data);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching clients:", error);
     }
@@ -256,36 +260,56 @@ const Client = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {getAllClientList.map((client, index) => (
-                      <tr key={index + 1}>
-                        <td>{index + 1}</td>
-                        <td>{client.contactPersonName}</td>
-                        <td>{client.companyName}</td>
-                        <td>{client.address}</td>
-                        <td>{client.city}</td>
-                        <td>{client.gstNo}</td>
-                        <td>{client.regNo}</td>
-                        <td>
-                          <button
-                            type="button"
-                            className="btn btn-col-2 btn-primary mx-2"
-                            onClick={() => editClient(client)}
-                          >
-                            <FaEdit />
-                            {/* Adjust margin as needed */}
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-col-2 btn-danger mx-2"
-                            onClick={() => {
-                              onDelete(client.clientId);
-                            }}
-                          >
-                            <FaTrash />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {isLoading ? (
+                      <div
+                        className="d-flex justify-content-center align-items-center"
+                        style={{ height: 200 }}
+                      >
+                        <Button variant="primary" disabled>
+                          <Spinner
+                            as="span"
+                            animation="grow"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                          />
+                          Loading...
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        {getAllClientList.map((client, index) => (
+                          <tr key={index + 1}>
+                            <td>{index + 1}</td>
+                            <td>{client.contactPersonName}</td>
+                            <td>{client.companyName}</td>
+                            <td>{client.address}</td>
+                            <td>{client.city}</td>
+                            <td>{client.gstNo}</td>
+                            <td>{client.regNo}</td>
+                            <td>
+                              <button
+                                type="button"
+                                className="btn btn-col-2 btn-primary mx-2"
+                                onClick={() => editClient(client)}
+                              >
+                                <FaEdit />
+                                {/* Adjust margin as needed */}
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-col-2 btn-danger mx-2"
+                                onClick={() => {
+                                  onDelete(client.clientId);
+                                }}
+                              >
+                                <FaTrash />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </>
+                    )}
                   </tbody>
                 </table>
               </div>

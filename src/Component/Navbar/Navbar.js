@@ -40,6 +40,9 @@ const Navbar = () => {
               <li className="nav-item">
                 <Link className="nav-link font-weight-bold" to="/Payment">Payment</Link>
               </li>
+              <li className="nav-item">
+                <Link className="nav-link font-weight-bold" to="/projectDetails">Project Details</Link>
+              </li>
             </ul>
           </div>
         </div>

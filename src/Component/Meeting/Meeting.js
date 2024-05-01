@@ -2,13 +2,16 @@ import React, { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
+import { toast } from 'react-toastify';
 import Swal from "sweetalert2";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import Spinner from "react-bootstrap/Spinner";
 
 const Meeting = () => {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [getMeetingsList, setGetMeetingsList] = useState([]);
   const [getmeetingsByProjectId, setgetmeetingsByProjectId] = useState([]);
   const [addUpdateProjectMeeting, setaddUpdateProjectMeeting] = useState({
@@ -26,6 +29,23 @@ const Meeting = () => {
     meetingTitle: "",
     meetingStatus: "",
   });
+
+
+  const [selectedOption, setSelectedOption] = useState('');
+
+  const options = ['Draft', 'Scheduled', 'Completed'];
+
+  const handleDropdownChange = (e) => {
+    setSelectedOption(e.target.value);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setaddUpdateProjectMeeting({
+      ...addUpdateProjectMeeting,
+      [name]: value
+    });
+  };
 
   // State variables for holding error messages
   const [errors, setErrors] = useState({
@@ -59,6 +79,7 @@ const Meeting = () => {
   };
 
   const getAllMeetings = async () => {
+    setIsLoading(true);
     try {
       const result = await axios.get(
         "https://freeapi.gerasim.in/api/ClientStrive/GetAllMeetings",
@@ -69,6 +90,7 @@ const Meeting = () => {
         }
       );
       setGetMeetingsList(result.data.data);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching meetings:", error);
     }
@@ -137,33 +159,28 @@ const Meeting = () => {
   };
 
   const SaveMeeting = async () => {
-    debugger;
     if (validateForm()) {
       try {
-        const result = await axios.post(
-          "https://freeapi.gerasim.in/api/ClientStrive/AddUpdateProjectMeeting",
-          addUpdateProjectMeeting,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
-            },
+        debugger;
+        const result = await axios.post("https://freeapi.gerasim.in/api/ClientStrive/AddUpdateProjectMeeting",
+          addUpdateProjectMeeting, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('loginToken')}`
           }
-        );
-        if (result.data.data) {
-          Swal.fire(" Meeting add Success!", result.data.data, "success");
-          getAllMeetings();
-          handleClose();
+        });
+        if (result.data.result) {
+          toast.success("Data saved successfully");
+          // Reset form data after saving
+
         } else {
-          alert(result.data.message);
-          getAllMeetings();
+          toast.error(result.data.message);
         }
       } catch (error) {
-        console.error("Error saving Meeting:", error);
+        console.error("Error:", error);
+        toast.error("An error occurred while saving data");
       }
-      return;
     }
   };
-
   const editMeeting = (meeting) => {
     setaddUpdateProjectMeeting(meeting);
     handleShow();
@@ -287,38 +304,58 @@ const Meeting = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {getMeetingsList.map((meeting, index) => (
-                      <tr key={index + 1}>
-                        <td>{index + 1}</td>
-                        <td>{meeting.meetingDate.split("T")[0]}</td>
-                        <td>{meeting.startTime}</td>
-                        <td>{meeting.endTime}</td>
-                        <td>{meeting.meetingMedium}</td>
-                        {/* <td>{meeting.recordingUrl}</td>
+                    {isLoading ? (
+                      <div
+                        className="d-flex justify-content-center align-items-center"
+                        style={{ height: 200 }}
+                      >
+                        <Button variant="primary" disabled>
+                          <Spinner
+                            as="span"
+                            animation="grow"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                          />
+                          Loading...
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        {getMeetingsList.map((meeting, index) => (
+                          <tr key={index + 1}>
+                            <td>{index + 1}</td>
+                            <td>{meeting.meetingDate.split("T")[0]}</td>
+                            <td>{meeting.startTime}</td>
+                            <td>{meeting.endTime}</td>
+                            <td>{meeting.meetingMedium}</td>
+                            {/* <td>{meeting.recordingUrl}</td>
                                                 <td>{meeting.meetingNotes}</td> */}
-                        <td>{meeting.clientPersonNames}</td>
-                        <td>{meeting.meetingTitle}</td>
-                        <td>{meeting.meetingStatus}</td>
-                        <td>
-                          <button
-                            type="button"
-                            className="btn btn-col-2 btn-primary mx-2"
-                            onClick={() => editMeeting(meeting)}
-                          >
-                            <FaEdit />
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-col-2 btn-danger mx-2"
-                            onClick={() => {
-                              OnDelete(meeting.projectId);
-                            }}
-                          >
-                            <FaTrash />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                            <td>{meeting.clientPersonNames}</td>
+                            <td>{meeting.meetingTitle}</td>
+                            <td>{meeting.meetingStatus}</td>
+                            <td>
+                              <button
+                                type="button"
+                                className="btn btn-col-2 btn-primary mx-2"
+                                onClick={() => editMeeting(meeting)}
+                              >
+                                <FaEdit />
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-col-2 btn-danger mx-2"
+                                onClick={() => {
+                                  OnDelete(meeting.projectId);
+                                }}
+                              >
+                                <FaTrash />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -340,11 +377,16 @@ const Meeting = () => {
                           <div className="row">
                             <div className="col-md-6">
                               <label>Project Id</label>
-                              <select
-                                name="projecId"
-                                id=""
-                                className="form-control"
-                              ></select>
+                              <select className='form-select' name="roleId" value={addUpdateProjectMeeting.projectId} onChange={handleChange}>
+                                <option>Seletct Project</option>
+                                {
+                                  getmeetingsByProjectId.map((peoject) => {
+                                    return (
+                                      <option key={peoject.projectId} value={peoject.projectId}>{peoject.ProjectName}</option>
+                                    )
+                                  })
+                                }
+                              </select>
                             </div>
                             <div className="col-md-6">
                               <label>Meeting Lead By EmpId</label>
@@ -511,22 +553,17 @@ const Meeting = () => {
                           <div className="row">
                             <div className="col-md-6">
                               <label htmlFor="">Meeting status</label>
-                              <input
-                                type="text"
-                                value={addUpdateProjectMeeting.meetingStatus}
-                                className="form-control"
-                                onChange={(event) =>
-                                  onChangeAddUpdateMeeting(
-                                    event,
-                                    "meetingStatus"
-                                  )
-                                }
-                                name="meetingStatus"
-                                placeholder="Meeting Status"
-                              />
-                              <small className="text-danger">
+                              <select id="dropdown" className="form-control" value={selectedOption} onChange={handleDropdownChange}>
+                                {/* Mapping through options to generate dropdown options */}
+                                {options.map((option, index) => (
+                                  <option key={index} value={option}>
+                                    {option}
+                                  </option>
+                                ))}
+                              </select>
+                              {/*<small className="text-danger">
                                 {errors.meetingStatus}
-                              </small>
+                              </small>*/}
                             </div>
                             <div className="col-md-6">
                               <label htmlFor="">IsRecording Available</label>

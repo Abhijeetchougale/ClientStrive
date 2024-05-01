@@ -7,22 +7,24 @@ import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Swal from "sweetalert2";
+import Spinner from "react-bootstrap/Spinner";
 
 const Payment = () => {
   const [ClientProjectList, setClientProjectList] = useState([]);
   const [ClientList, setClientList] = useState([]);
   const [PaymentList, setPaymentList] = useState([]);
   const [show, setShow] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [Paymentobj, setPaymentobj] = useState({
-    "amount": 0,
-    "paymentDate": "",
-    "paymentMode": "",
-    "projectPaymentId": 0,
-    "naration": "",
-    "projectName": "",
-    "companyName": "",
-    "clientId": 0,
-    "projectId": 0
+    amount: 0,
+    paymentDate: "",
+    paymentMode: "",
+    projectPaymentId: 0,
+    naration: "",
+    projectName: "",
+    companyName: "",
+    clientId: 0,
+    projectId: 0,
   });
 
   useEffect(() => {
@@ -32,6 +34,7 @@ const Payment = () => {
   }, []);
 
   const getAllPaymentList = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get(
         "https://freeapi.gerasim.in/api/ClientStrive/GetAllPayments",
@@ -43,6 +46,7 @@ const Payment = () => {
       );
       if (response.data.result === true) {
         setPaymentList(response.data.data);
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Error fetching payment list:", error);
@@ -69,18 +73,21 @@ const Payment = () => {
 
   const getAllClient = async () => {
     try {
-        const response = await axios.get("https://freeapi.gerasim.in/api/ClientStrive/GetAllClients", {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('loginToken')}`
-            }
-        });
-        if (response.data.result === true) {
-            setClientList(response.data.data);
+      const response = await axios.get(
+        "https://freeapi.gerasim.in/api/ClientStrive/GetAllClients",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
+          },
         }
+      );
+      if (response.data.result === true) {
+        setClientList(response.data.data);
+      }
     } catch (error) {
-        console.error('Error fetching client list:', error);
+      console.error("Error fetching client list:", error);
     }
-};
+  };
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -102,26 +109,26 @@ const Payment = () => {
       cancelButtonText: "Cancel",
     });
     if (confirmDelete.isConfirmed) {
-    try {
-      const response = await axios.delete(
-        "https://freeapi.gerasim.in/api/ClientStrive/DeletePaymentByPaymentId?paymentId=" +
-          projectPaymentId,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
-          },
+      try {
+        const response = await axios.delete(
+          "https://freeapi.gerasim.in/api/ClientStrive/DeletePaymentByPaymentId?paymentId=" +
+            projectPaymentId,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
+            },
+          }
+        );
+        if (response.data.result) {
+          Swal.fire("Success!", "PaymentList Deleted Successfully", "success");
+          getAllPaymentList();
+        } else {
+          Swal.fire("Error!", response.data.message, "error");
         }
-      );
-      if (response.data.result) {
-        Swal.fire("Success!", "PaymentList Deleted Successfully", "success");
-        getAllPaymentList();
-      } else {
-        Swal.fire("Error!", response.data.message, "error");
+      } catch (error) {
+        console.error("Error deleting payment:", error);
       }
-    } catch (error) {
-      console.error("Error deleting payment:", error);
     }
-  }
   };
 
   const handleChange = (event, key) => {
@@ -250,34 +257,54 @@ const Payment = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {PaymentList.map((payment, index) => (
-                    <tr key={payment.projectPaymentId}>
-                      <td>{index + 1}</td>
-                      <td>{payment.projectName}</td>
-                      <td>{payment.companyName}</td>
-                      <td>{payment.paymentDate.split("T")[0]}</td>
-                      <td>{payment.paymentMode}</td>
-                      <td>{payment.amount}</td>
-                      <td>{payment.naration}</td>
-                      <td>
-                        <Button
-                          variant="primary"
-                          className="btn btn-col-2 btn-primary mx-2"
-                          onClick={() => onEdit(payment)}
-                        >
-                          {" "}
-                          <FaEdit /> 
-                        </Button>
-                        <Button
-                          variant="danger"
-                          className="btn btn-col-2 btn-danger mx-2"
-                          onClick={() => onDelete(payment.projectPaymentId)}
-                        >
-                          <FaTrash /> 
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
+                  {isLoading ? (
+                    <div
+                      className="d-flex justify-content-center align-items-center"
+                      style={{ height: 200 }}
+                    >
+                      <Button variant="primary" disabled>
+                        <Spinner
+                          as="span"
+                          animation="grow"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />
+                        Loading...
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      {PaymentList.map((payment, index) => (
+                        <tr key={payment.projectPaymentId}>
+                          <td>{index + 1}</td>
+                          <td>{payment.projectName}</td>
+                          <td>{payment.companyName}</td>
+                          <td>{payment.paymentDate.split("T")[0]}</td>
+                          <td>{payment.paymentMode}</td>
+                          <td>{payment.amount}</td>
+                          <td>{payment.naration}</td>
+                          <td>
+                            <Button
+                              variant="primary"
+                              className="btn btn-col-2 btn-primary mx-2"
+                              onClick={() => onEdit(payment)}
+                            >
+                              {" "}
+                              <FaEdit />
+                            </Button>
+                            <Button
+                              variant="danger"
+                              className="btn btn-col-2 btn-danger mx-2"
+                              onClick={() => onDelete(payment.projectPaymentId)}
+                            >
+                              <FaTrash />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -319,17 +346,26 @@ const Payment = () => {
                           ))}
                         </select>
                       </div>
-                      <div className='col-md-6'>
-                                            <label>CompanyName</label>
-                                            <select className='form-select' value={Paymentobj.clientId} onChange={(event) => handleChange(event, 'clientId')}>
-                                                <option>Select Company</option>
-                                                {ClientList.map((client) => (
-                                                    <option key={client.clientId} value={client.clientId}>{client.companyName}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        </div>
-                                        <div className="row">
+                      <div className="col-md-6">
+                        <label>CompanyName</label>
+                        <select
+                          className="form-select"
+                          value={Paymentobj.clientId}
+                          onChange={(event) => handleChange(event, "clientId")}
+                        >
+                          <option>Select Company</option>
+                          {ClientList.map((client) => (
+                            <option
+                              key={client.clientId}
+                              value={client.clientId}
+                            >
+                              {client.companyName}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="row">
                       <div className="col-md-6">
                         <label>Payment Date</label>
                         <input
@@ -342,7 +378,7 @@ const Payment = () => {
                           }
                         />
                       </div>
-                    
+
                       <div className="col-md-6">
                         <label>Payment Mode</label>
                         <input
@@ -355,8 +391,8 @@ const Payment = () => {
                           }
                         />
                       </div>
-                      </div>
-                      <div className="row">
+                    </div>
+                    <div className="row">
                       <div className="col-md-6">
                         <label>Amount</label>
                         <input
@@ -367,7 +403,7 @@ const Payment = () => {
                           onChange={(event) => handleChange(event, "amount")}
                         />
                       </div>
-                    
+
                       <div className="col-md-6">
                         <label>Naration</label>
                         <input

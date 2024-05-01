@@ -5,9 +5,11 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
+import Spinner from "react-bootstrap/Spinner";
 
 const Change = () => {
   const [empList, setEmpList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [clientProjectList, setClientProjectList] = useState([]);
   const [projectChangeList, setProjectChangeList] = useState([]);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
@@ -68,15 +70,21 @@ const Change = () => {
   };
 
   const getAllProjectChange = async () => {
-    const response = await axios.get(
-      "https://freeapi.gerasim.in/api/ClientStrive/GetAllProjectChange",
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
-        },
-      }
-    );
-    setProjectChangeList(response.data.data);
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        "https://freeapi.gerasim.in/api/ClientStrive/GetAllProjectChange",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
+          },
+        }
+      );
+      setProjectChangeList(response.data.data);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching project change:", error);
+    }
   };
 
   useEffect(() => {
@@ -222,35 +230,55 @@ const Change = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {projectChangeList.map((change, index) => {
-                      return (
-                        <tr key={index}>
-                          <td>{index + 1}</td>
-                          <td>{change.changeDetails}</td>
-                          <td>{change.projectName}</td>
-                          <td>{change.companyName}</td>
-                          <td>{change.changeApprovedBy}</td>
-                          <td>
-                            <button
-                              type="button"
-                              className="btn btn-col-2 btn-primary mx-2"
-                              onClick={() => onEdit(change)}
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              type="button"
-                              className="btn btn-col-2 btn-danger mx-2"
-                              onClick={() => {
-                                onDelete(change.projectChangeId);
-                              }}
-                            >
-                              <FaTrash />
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {isLoading ? (
+                      <div
+                        className="d-flex justify-content-center align-items-center"
+                        style={{ height: 200 }}
+                      >
+                        <Button variant="primary" disabled>
+                          <Spinner
+                            as="span"
+                            animation="grow"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                          />
+                          Loading...
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        {projectChangeList.map((change, index) => {
+                          return (
+                            <tr key={index}>
+                              <td>{index + 1}</td>
+                              <td>{change.changeDetails}</td>
+                              <td>{change.projectName}</td>
+                              <td>{change.companyName}</td>
+                              <td>{change.changeApprovedBy}</td>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-col-2 btn-primary mx-2"
+                                  onClick={() => onEdit(change)}
+                                >
+                                  <FaEdit />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-col-2 btn-danger mx-2"
+                                  onClick={() => {
+                                    onDelete(change.projectChangeId);
+                                  }}
+                                >
+                                  <FaTrash />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </>
+                    )}
                   </tbody>
                 </table>
               </div>

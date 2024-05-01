@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "react-bootstrap";
+import Spinner from 'react-bootstrap/Spinner';
 import { useNavigate } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
@@ -10,12 +11,14 @@ import Swal from "sweetalert2";
 const Employee = () => {
   const navigate = useNavigate();
   const [empList, setEmpList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     getAllEmp();
   }, []);
 
   const getAllEmp = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get(
         "https://freeapi.gerasim.in/api/ClientStrive/GetAllEmployee",
@@ -26,6 +29,7 @@ const Employee = () => {
         }
       );
       setEmpList(response.data.data);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching employees:", error);
     }
@@ -112,6 +116,23 @@ const Employee = () => {
                   </tr>
                 </thead>
                 <tbody>
+                 { isLoading ? 
+                  <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{ height: 200 }}
+                  >
+                    <Button variant="primary" disabled>
+                      <Spinner
+                        as="span"
+                        animation="grow"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                      />
+                      Loading...
+                    </Button>
+                  </div>
+                  : <>
                   {empList.map((emp, index) => (
                     <tr key={emp.empId}>
                       <td>{index + 1}</td>
@@ -136,6 +157,8 @@ const Employee = () => {
                       </td>
                     </tr>
                   ))}
+                  </>
+                  }
                 </tbody>
               </table>
             </div>

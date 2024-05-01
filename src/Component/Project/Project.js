@@ -2,11 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash , FaEye} from "react-icons/fa";
 import Swal from "sweetalert2";
+import Spinner from "react-bootstrap/Spinner";
+import { useNavigate } from "react-router-dom";
 
 const Project = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [allClients, setAllClients] = useState([]);
   const [allProjects, setAllProjects] = useState([]);
   const [allEmployees, setAllEmployees] = useState([]);
@@ -51,6 +55,7 @@ const Project = () => {
   };
 
   const getAllProjects = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get(
         "https://freeapi.gerasim.in/api/ClientStrive/GetAllClientProjects",
@@ -61,6 +66,7 @@ const Project = () => {
         }
       );
       setAllProjects(response.data.data);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching projects:", error);
     }
@@ -187,6 +193,11 @@ const Project = () => {
     }
   };
 
+  const handleView = (projectId) => {
+
+    navigate(`/projectDetails/${projectId}`);
+  }
+
   const handleReset = () => {
     setFormData({
       clientProjectId: 0,
@@ -285,34 +296,64 @@ const Project = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {allProjects.map((project, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{project.projectName}</td>
-                      <td>{project.clientName}</td>
-                      <td>{project.empName}</td>
-                      <td>{project.empEmailId}</td>
-                      {/* <td>{project.empDesignation}</td> */}
-                      <td>{project.startDate.split("T")[0]}</td>
-                      <td>{project.expectedEndDate.split("T")[0]}</td>
-                      <td>
-                        <button
-                          className="btn btn-col-1 btn-primary mx-2"
-                          onClick={() => handleEdit(project.clientProjectId)}
-                        >
-                          <FaEdit />
-                          
-                        </button>
-                        <button
-                          className="btn btn-col-1 btn-danger mx-2"
-                          onClick={() => handleDelete(project.clientProjectId)}
-                        >
-                          <FaTrash />
-                          
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {isLoading ? (
+                    <div
+                      className="d-flex justify-content-center align-items-center"
+                      style={{ height: 200 }}
+                    >
+                      <Button variant="primary" disabled>
+                        <Spinner
+                          as="span"
+                          animation="grow"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />
+                        Loading...
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      {allProjects.map((project, index) => (
+                        <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td>{project.projectName}</td>
+                          <td>{project.clientName}</td>
+                          <td>{project.empName}</td>
+                          <td>{project.empEmailId}</td>
+                          {/* <td>{project.empDesignation}</td> */}
+                          <td>{project.startDate.split("T")[0]}</td>
+                          <td>{project.expectedEndDate.split("T")[0]}</td>
+                          <td>
+                            <button
+                              className="btn btn-col-1 btn-primary mx-2"
+                              onClick={() =>
+                                handleView(project.clientProjectId)
+                              }
+                            >
+                              <FaEye />
+                            </button>
+                            <button
+                              className="btn btn-col-1 btn-primary mx-2"
+                              onClick={() =>
+                                handleEdit(project.clientProjectId)
+                              }
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              className="btn btn-col-1 btn-danger mx-2"
+                              onClick={() =>
+                                handleDelete(project.clientProjectId)
+                              }
+                            >
+                              <FaTrash />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </>
+                  )}
                 </tbody>
               </table>
             </div>

@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
+import Spinner from "react-bootstrap/Spinner";
 
 const ProjectEmployees = () => {
   const [projectEmpObj, setProjectEmpObj] = useState({
@@ -15,6 +16,7 @@ const ProjectEmployees = () => {
   const [allEmployee, setAllEmployee] = useState([]);
   const [allProjects, setAllProjects] = useState([]);
   const [allProjjectEmployees, setAllProjjectEmployees] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     getAllEmp();
@@ -44,6 +46,7 @@ const ProjectEmployees = () => {
   };
 
   const getAllEmpWorkOnProject = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get(
         "https://freeapi.gerasim.in/api/ClientStrive/GetAllProjectsEmployees",
@@ -54,6 +57,7 @@ const ProjectEmployees = () => {
         }
       );
       setAllProjjectEmployees(response.data.data);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching employees working on projects:", error);
     }
@@ -192,23 +196,45 @@ const ProjectEmployees = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {allProjjectEmployees.map((item) => {
-                    return (
-                      <tr key={item.projectEmpId}>
-                        <td>{item.empName}</td>
-                        <td>{item.projectName}</td>
-                        <td>{item.addedDate.split("T")[0]}</td>
-                        <td>
-                          <button
-                            className="btn btn-danger"
-                            onClick={() => handleDeleteData(item.projectEmpId)}
-                          >
-                            <FaTrash />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {isLoading ? (
+                    <div
+                      className="d-flex justify-content-center align-items-center"
+                      style={{ height: 200 }}
+                    >
+                      <Button variant="primary" disabled>
+                        <Spinner
+                          as="span"
+                          animation="grow"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />
+                        Loading...
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      {allProjjectEmployees.map((item) => {
+                        return (
+                          <tr key={item.projectEmpId}>
+                            <td>{item.empName}</td>
+                            <td>{item.projectName}</td>
+                            <td>{item.addedDate.split("T")[0]}</td>
+                            <td>
+                              <button
+                                className="btn btn-danger"
+                                onClick={() =>
+                                  handleDeleteData(item.projectEmpId)
+                                }
+                              >
+                                <FaTrash />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </>
+                  )}
                 </tbody>
               </table>
             </div>
