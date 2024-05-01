@@ -7,18 +7,32 @@ import { useNavigate } from 'react-router-dom';
 const Login = ({ setLoggedIn }) => {
   const [emailId, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({
+    emailId: '',
+    password: ''
+  });
   const navigate = useNavigate();
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
+    setErrors({ ...errors, emailId: '' });
   };
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
+    setErrors({ ...errors, password: '' });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!emailId) {
+      setErrors({ ...errors, emailId: 'Email address is required' });
+      return;
+    }
+    if (!password) {
+      setErrors({ ...errors, password: 'Password is required' });
+      return;
+    }
     try {
       const loginObj = {
         "password": password,
@@ -47,7 +61,7 @@ const Login = ({ setLoggedIn }) => {
             <Col xs={12} md={5} className="login-form">
               <h1 className='text-center'>Login</h1>
               <Form onSubmit={handleSubmit}>
-                <Form.Group >
+                <Form.Group>
                   <Form.Label className='font-lg'>Email address</Form.Label>
                   <Form.Control
                     type="text"
@@ -55,9 +69,10 @@ const Login = ({ setLoggedIn }) => {
                     value={emailId}
                     onChange={handleEmailChange}
                   />
+                  {errors.emailId && <Form.Text className="text-warning">{errors.emailId}</Form.Text>}
                 </Form.Group>
 
-                <Form.Group >
+                <Form.Group>
                   <Form.Label className='font-lg'>Password</Form.Label>
                   <Form.Control
                     type="password"
@@ -65,9 +80,10 @@ const Login = ({ setLoggedIn }) => {
                     value={password}
                     onChange={handlePasswordChange}
                   />
+                  {errors.password && <Form.Text className="text-warning">{errors.password}</Form.Text>}
                 </Form.Group>
 
-                <div className="text-center mt-2 " >
+                <div className="text-center mt-2">
                   <Button variant="primary" type="submit" className='btn-lg'>
                     Login
                   </Button>
