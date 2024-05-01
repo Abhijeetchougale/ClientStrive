@@ -254,9 +254,9 @@ const Meeting = () => {
               <div className="card-header bg-info">
                 <div className="row mt-2">
                   <div className="col-md-10 text-center ">
-                    <h4 className="text-center">Get All Metting List</h4>
+                    <h4 className="text-start">Get All Metting List</h4>
                   </div>
-                  <div className="col-md-2">
+                  <div className="col-md-2 text-end">
                     <React.Fragment>
                       <Button
                         variant="success"
@@ -280,7 +280,7 @@ const Meeting = () => {
                       <th>Meeting Medium</th>
                       {/* <th>RecordingUrl</th>
                                             <th>Meeting Notes</th> */}
-                      <th>Client Person Names</th>
+                      <th>Client Person</th>
                       <th>Meeting Title</th>
                       <th>Meeting Status</th>
                       <th>Action</th>
@@ -290,7 +290,7 @@ const Meeting = () => {
                     {getMeetingsList.map((meeting, index) => (
                       <tr key={index + 1}>
                         <td>{index + 1}</td>
-                        <td>{meeting.meetingDate}</td>
+                        <td>{meeting.meetingDate.split("T")[0]}</td>
                         <td>{meeting.startTime}</td>
                         <td>{meeting.endTime}</td>
                         <td>{meeting.meetingMedium}</td>
@@ -305,8 +305,7 @@ const Meeting = () => {
                             className="btn btn-col-2 btn-primary mx-2"
                             onClick={() => editMeeting(meeting)}
                           >
-                            <FaEdit style={{ marginRight: "5px" }} /> Edit{" "}
-                            {/* Adjust margin as needed */}
+                            <FaEdit />
                           </button>
                           <button
                             type="button"
@@ -315,7 +314,7 @@ const Meeting = () => {
                               OnDelete(meeting.projectId);
                             }}
                           >
-                            <FaTrash style={{ marginRight: "5px" }} /> Delete
+                            <FaTrash />
                           </button>
                         </td>
                       </tr>

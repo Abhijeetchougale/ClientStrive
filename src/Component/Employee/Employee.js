@@ -83,9 +83,9 @@ const Employee = () => {
             <div className="card-header bg-info">
               <div className="row mt-2">
                 <div className="col-md-10 text-center">
-                  <h4 className="text-center">Get All Employee List</h4>
+                  <h4 className="text-start">Get All Employee List</h4>
                 </div>
-                <div className="col-md-2">
+                <div className="col-md-2 text-end">
                   <Button
                     variant="success"
                     className="btn-md m-1 text-right"
@@ -125,16 +125,13 @@ const Employee = () => {
                           className="btn btn-col-2 btn-primary mx-2"
                           onClick={() => handleEditForm(emp.empId)}
                         >
-                          {" "}
-                          <FaEdit style={{ marginRight: "5px" }} />
-                          Edit
+                          <FaEdit />
                         </button>
                         <button
                           className="btn btn-col-2 btn-danger mx-2"
                           onClick={() => handleDelete(emp.empId)}
                         >
-                          <FaTrash style={{ marginRight: "5px" }} />
-                          Delete
+                          <FaTrash />
                         </button>
                       </td>
                     </tr>

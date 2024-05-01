@@ -259,9 +259,9 @@ const Project = () => {
             <div className="card-header bg-info">
               <div className="row mt-2">
                 <div className="col-md-10 text-center ">
-                  <h4 className="text-center">Get All Project Details</h4>
+                  <h4 className="text-start">Get All Project Details</h4>
                 </div>
-                <div className="col-md-2">
+                <div className="col-md-2 text-end">
                   <Button variant="success" onClick={handleShowModal}>
                     <FaPlus />
                     Add
@@ -270,17 +270,17 @@ const Project = () => {
               </div>
             </div>
             <div className="card-body">
-              <table className="table table-border table-border-stripped">
+              <table className="table table-bordered ">
                 <thead>
                   <tr>
                     <th>Sr.No</th>
-                    <th>Project Name</th>
-                    <th>Client Name</th>
-                    <th>Employee Name</th>
+                    <th>Project </th>
+                    <th>Client </th>
+                    <th>Employee </th>
                     <th>Employee EmailId</th>
-                    <th>Employee Designation</th>
+                    {/* <th>Employee Designation</th> */}
                     <th>Start Date</th>
-                    <th>Expected End Date</th>
+                    <th>End Date</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -292,23 +292,23 @@ const Project = () => {
                       <td>{project.clientName}</td>
                       <td>{project.empName}</td>
                       <td>{project.empEmailId}</td>
-                      <td>{project.empDesignation}</td>
-                      <td>{project.startDate}</td>
-                      <td>{project.expectedEndDate}</td>
+                      {/* <td>{project.empDesignation}</td> */}
+                      <td>{project.startDate.split("T")[0]}</td>
+                      <td>{project.expectedEndDate.split("T")[0]}</td>
                       <td>
                         <button
-                          className="btn btn-col-2 btn-primary mx-2"
+                          className="btn btn-col-1 btn-primary mx-2"
                           onClick={() => handleEdit(project.clientProjectId)}
                         >
-                          <FaEdit style={{ marginRight: "5px" }} />
-                          Edit
+                          <FaEdit />
+                          
                         </button>
                         <button
-                          className="btn btn-col-2 btn-danger mx-2"
+                          className="btn btn-col-1 btn-danger mx-2"
                           onClick={() => handleDelete(project.clientProjectId)}
                         >
-                          <FaTrash style={{ marginRight: "5px" }} />
-                          Delete
+                          <FaTrash />
+                          
                         </button>
                       </td>
                     </tr>

@@ -227,9 +227,9 @@ const Client = () => {
               <div className="card-header bg-info">
                 <div className="row mt-2">
                   <div className="col-md-10 text-center ">
-                    <h4 className="text-center">Get All Client List</h4>
+                    <h4 className="text-start">Get All Client List</h4>
                   </div>
-                  <div className="col-md-2">
+                  <div className="col-md-2 text-end">
                     <Button
                       variant="success"
                       className="btn-md m-1 text-right"
@@ -246,8 +246,8 @@ const Client = () => {
                   <thead>
                     <tr>
                       <th>Sr.No</th>
-                      <th>Person Name</th>
-                      <th>Company Name</th>
+                      <th>Person </th>
+                      <th>Company </th>
                       <th>Address</th>
                       <th>City</th>
                       <th>GST No</th>
@@ -271,7 +271,7 @@ const Client = () => {
                             className="btn btn-col-2 btn-primary mx-2"
                             onClick={() => editClient(client)}
                           >
-                            <FaEdit style={{ marginRight: "5px" }} /> Edit{" "}
+                            <FaEdit />
                             {/* Adjust margin as needed */}
                           </button>
                           <button
@@ -281,7 +281,7 @@ const Client = () => {
                               onDelete(client.clientId);
                             }}
                           >
-                            <FaTrash style={{ marginRight: "5px" }} /> Delete
+                            <FaTrash />
                           </button>
                         </td>
                       </tr>

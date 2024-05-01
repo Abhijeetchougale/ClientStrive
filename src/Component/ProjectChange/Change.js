@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import sweetAlertService from "../../Service/sweetAlertServices";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col, Card } from "react-bootstrap";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
@@ -195,7 +195,7 @@ const Change = () => {
               <div className="card-header bg-info">
                 <div className="row mt-2">
                   <div className="col-md-10 text-start">
-                    <h4 className="text-center">Get All Project Change List</h4>
+                    <h4 className="text-start">Get All Project Change List</h4>
                   </div>
                   <div className="col-md-2 text-end">
                     <Button
@@ -217,7 +217,7 @@ const Change = () => {
                       <th>Change Details</th>
                       <th>Project Name</th>
                       <th>Company Name</th>
-                      <th>Employee Name</th>
+                      <th>Approved By Employee</th>
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -236,7 +236,7 @@ const Change = () => {
                               className="btn btn-col-2 btn-primary mx-2"
                               onClick={() => onEdit(change)}
                             >
-                              <FaEdit style={{ marginRight: "5px" }} /> Edit
+                              <FaEdit />
                             </button>
                             <button
                               type="button"
@@ -245,7 +245,7 @@ const Change = () => {
                                 onDelete(change.projectChangeId);
                               }}
                             >
-                              <FaTrash style={{ marginRight: "5px" }} /> Delete
+                              <FaTrash />
                             </button>
                           </td>
                         </tr>
@@ -265,57 +265,54 @@ const Change = () => {
             </Modal.Header>
             <Modal.Body>
               <Form>
-                <Form.Group controlId="projectId" className="mb-1">
-                  <Form.Label>Select Project:</Form.Label>
-                  <select
-                    className="form-select"
-                    name="projectId"
-                    value={formData.projectId}
-                    onChange={handleChange}
-                  >
-                    <option>Select Project</option>
-                    {clientProjectList.map((rol) => {
-                      return (
-                        <option
-                          key={rol.clientProjectId}
-                          value={rol.clientProjectId}
-                        >
-                          {rol.projectName}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  {isFormSubmitted && formData.projectId === 0 && (
-                    <div className="text-danger">This field is required.</div>
-                  )}
-                </Form.Group>
-                <Form.Group controlId="changeDetails" className="mb-1">
-                  <Form.Label>Change Details:</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    name="changeDetails"
-                    value={formData.changeDetails}
-                    onChange={handleChange}
-                  />
-                  {isFormSubmitted && formData.changeDetails === "" && (
-                    <div className="text-danger">This field is required.</div>
-                  )}
-                </Form.Group>
-                <Form.Group controlId="changeDate" className="mb-1">
-                  <Form.Label>Change Date:</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="changeDate"
-                    value={formData.changeDate.split("T")[0]}
-                    onChange={handleChange}
-                  />
-                  {isFormSubmitted && formData.changeDate === "" && (
-                    <div className="text-danger">This field is required.</div>
-                  )}
-                </Form.Group>
+                <Row>
+                  <Col>
+                    <Form.Group controlId="projectId" className="mb-1">
+                      <Form.Label>Select Project:</Form.Label>
+                      <select
+                        className="form-select"
+                        name="projectId"
+                        value={formData.projectId}
+                        onChange={handleChange}
+                      >
+                        <option>Select Project</option>
+                        {clientProjectList.map((rol) => {
+                          return (
+                            <option
+                              key={rol.clientProjectId}
+                              value={rol.clientProjectId}
+                            >
+                              {rol.projectName}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      {isFormSubmitted && formData.projectId === 0 && (
+                        <div className="text-danger">
+                          This field is required.
+                        </div>
+                      )}
+                    </Form.Group>
+                  </Col>
+                  <Col>
+                    <Form.Group controlId="changeDate" className="mb-1">
+                      <Form.Label>Change Date:</Form.Label>
+                      <Form.Control
+                        type="date"
+                        name="changeDate"
+                        value={formData.changeDate.split("T")[0]}
+                        onChange={handleChange}
+                      />
+                      {isFormSubmitted && formData.changeDate === "" && (
+                        <div className="text-danger">
+                          This field is required.
+                        </div>
+                      )}
+                    </Form.Group>
+                  </Col>
+                </Row>
                 <Form.Group controlId="approvedByEmpId" className="mb-1">
-                  <Form.Label>Select Employee:</Form.Label>
+                  <Form.Label>Approved By Employee:</Form.Label>
                   <select
                     className="form-select"
                     name="approvedByEmpId"
@@ -335,12 +332,25 @@ const Change = () => {
                     <div className="text-danger">This field is required.</div>
                   )}
                 </Form.Group>
+                <Form.Group controlId="changeDetails" className="mb-1">
+                  <Form.Label>Change Details:</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    name="changeDetails"
+                    value={formData.changeDetails}
+                    onChange={handleChange}
+                  />
+                  {isFormSubmitted && formData.changeDetails === "" && (
+                    <div className="text-danger">This field is required.</div>
+                  )}
+                </Form.Group>
               </Form>
             </Modal.Body>
             <Modal.Footer>
               {formData.projectChangeId === 0 ? (
                 <Button variant="primary" className="mt-2" onClick={handleSave}>
-                  Submit
+                  Add
                 </Button>
               ) : (
                 <Button

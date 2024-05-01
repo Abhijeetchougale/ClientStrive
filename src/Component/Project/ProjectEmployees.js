@@ -179,14 +179,14 @@ const ProjectEmployees = () => {
         <div className="col-5 offset-1">
           <div className="card bg-light">
             <div className="crad-header bg-info p-2">
-              <h4 className="text-center">Project Lead Employees</h4>
+              <h4 className="text-start">Project Lead Employees</h4>
             </div>
             <div className="card-body">
               <table className="table table-bordered ">
                 <thead>
                   <tr>
-                    <th>Employee Name</th>
-                    <th>Project Name</th>
+                    <th>Employee</th>
+                    <th>Project</th>
                     <th>Added Date</th>
                     <th>Action</th>
                   </tr>
@@ -197,14 +197,13 @@ const ProjectEmployees = () => {
                       <tr key={item.projectEmpId}>
                         <td>{item.empName}</td>
                         <td>{item.projectName}</td>
-                        <td>{item.addedDate}</td>
+                        <td>{item.addedDate.split("T")[0]}</td>
                         <td>
                           <button
                             className="btn btn-danger"
                             onClick={() => handleDeleteData(item.projectEmpId)}
                           >
-                            <FaTrash style={{ marginRight: "5px" }} />
-                            Delete
+                            <FaTrash />
                           </button>
                         </td>
                       </tr>
@@ -218,7 +217,7 @@ const ProjectEmployees = () => {
         <div className="col-5">
           <div className="card bg-light">
             <div className="card-header bg-info p-2">
-              <h4 className=" text-center">Project Employee Form</h4>
+              <h4 className=" text-start">Project Employee Form</h4>
             </div>
             <div className="card-body">
               <Row>
