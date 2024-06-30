@@ -27,6 +27,7 @@ const Payment = () => {
     projectId: 0,
   });
 
+
   useEffect(() => {
     getAllPaymentList();
     getAllClientProject();
@@ -59,7 +60,7 @@ const Payment = () => {
         "https://freeapi.gerasim.in/api/ClientStrive/GetAllClientProjects",
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
+            Authorization: ` Bearer ${localStorage.getItem("loginToken")}`,
           },
         }
       );
@@ -89,6 +90,7 @@ const Payment = () => {
     }
   };
 
+
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
@@ -112,7 +114,7 @@ const Payment = () => {
       try {
         const response = await axios.delete(
           "https://freeapi.gerasim.in/api/ClientStrive/DeletePaymentByPaymentId?paymentId=" +
-            projectPaymentId,
+          projectPaymentId,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
@@ -133,66 +135,93 @@ const Payment = () => {
 
   const handleChange = (event, key) => {
     setPaymentobj((prevObj) => ({ ...prevObj, [key]: event.target.value }));
+    setErrors((prevErrors) => ({ ...prevErrors, [key]: "" }));
+
   };
+
+  const [errors, setErrors] = useState({
+    amount: "",
+    paymentDate: "",
+    paymentMode: "",
+    naration: "",
+    projectName: "",
+    companyName: "",
+    clientId: "",
+    projectId: "",
+  })
 
   const validatePayment = () => {
-    if (
-      !Paymentobj.projectId ||
-      !Paymentobj.amount ||
-      Paymentobj.paymentMode === 0
-    ) {
-      toast.error("Please fill out all required fields.");
-      return false;
+    let isValid = true;
+    const newErrors = { ...errors };
+
+
+    if (!Paymentobj.projectName.trim()) {
+      newErrors.projectName = "Person Name is required";
+      isValid = false;
+
     }
-    return true;
+    if (!Paymentobj.companyName.trim()) {
+      newErrors.companyName = "Company Name is required";
+      isValid = false;
+    }
+    if (!Paymentobj.amount) {
+      newErrors.amount = "Amount is required";
+      isValid = false;
+    }
+    if (!Paymentobj.paymentMode) {
+      newErrors.paymentMode = "PaymentMode is required";
+      isValid = false;
+    }
+    if (!Paymentobj.naration) {
+      newErrors.naration = "Naration is required";
+      isValid = false;
+    }
+    setErrors(newErrors);
+    return isValid;
   };
-  // const validatePayment = () => {
-  //     if (!Paymentobj.projectName.trim() || !Paymentobj.companyName.trim() || Paymentobj.clientId === 0) {
-  //         toast.error('Please fill out all required fields.');
-  //         return false;
-  //     }
-  //     return true;
-  // };
+
   const AddPayment = async () => {
-    if (!validatePayment()) {
+
+    if (validatePayment()) {
+      try {
+        const response = await axios.post(
+          "https://freeapi.gerasim.in/api/ClientStrive/AddUpdatePayment",
+          Paymentobj,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
+            },
+          }
+        );
+        if (response.data.result) {
+          toast.success("Payment Added Successfully");
+        } else {
+          toast.error(response.data.message);
+        }
+        getAllPaymentList();
+        handleClose();
+      } catch (error) {
+        console.error("Error adding payment:", error);
+        toast.error("Error adding payment");
+      }
       return;
     }
-    try {
-      const response = await axios.post(
-        "https://freeapi.gerasim.in/api/ClientStrive/AddUpdatePayment",
-        Paymentobj,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
-          },
-        }
-      );
-      if (response.data.result) {
-        toast.success("Payment Added Successfully");
-      } else {
-        toast.error(response.data.message);
-      }
-      getAllPaymentList();
-      handleClose();
-    } catch (error) {
-      console.error("Error adding payment:", error);
-      toast.error("Error adding payment");
-    }
+
   };
 
-  // const resetPaymentobj = () => {
-  //     setPaymentobj({
-  //         "projectPaymentId": 0,
-  //         "projectId": 0,
-  //         "paymentDate": "",
-  //         "paymentMode": "",
-  //         "amount": 0,
-  //         "naration": ""
-  //     });
-  // };
+  const resetPaymentobj = () => {
+    setPaymentobj({
+      "projectPaymentId": 0,
+      "projectId": 0,
+      "paymentDate": "",
+      "paymentMode": "",
+      "amount": 0,
+      "naration": ""
+    });
+  };
 
   const UpdatePayment = async () => {
-    if (!validatePayment()) {
+    if (validatePayment()) {
       return;
     }
     try {
@@ -216,15 +245,15 @@ const Payment = () => {
       console.error("Error updating payment:", error);
       toast.error("Error updating payment");
     }
-    //resetPaymentobj();
-    //setShow(true);
+    resetPaymentobj();
+    setShow(true);
   };
 
   return (
     <div>
       <div className="row mt-3">
         <div className="col-md-1"></div>
-        <div className="col-md-10">
+        <div className="col-md-12">
           <div className="card bg-light">
             <div className="card-header bg-info">
               <div className="row mt-2">
@@ -377,6 +406,9 @@ const Payment = () => {
                             handleChange(event, "paymentDate")
                           }
                         />
+                        <small className="text-danger">
+                          {errors.paymentDate}
+                        </small>
                       </div>
 
                       <div className="col-md-6">
@@ -390,7 +422,11 @@ const Payment = () => {
                             handleChange(event, "paymentMode")
                           }
                         />
+                        <small className="text-danger">
+                          {errors.paymentMode}
+                        </small>
                       </div>
+                      
                     </div>
                     <div className="row">
                       <div className="col-md-6">
@@ -402,6 +438,9 @@ const Payment = () => {
                           placeholder="Enter amount"
                           onChange={(event) => handleChange(event, "amount")}
                         />
+                        <small className="text-danger">
+                          {errors.amount}
+                        </small>
                       </div>
 
                       <div className="col-md-6">
@@ -413,6 +452,9 @@ const Payment = () => {
                           placeholder="Enter naration"
                           onChange={(event) => handleChange(event, "naration")}
                         />
+                        <small className="text-danger">
+                          {errors.naration}
+                        </small>
                       </div>
                     </div>
                   </div>

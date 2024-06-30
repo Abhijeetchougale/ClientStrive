@@ -13,7 +13,7 @@ import ProjectDetails from '../ProjectDetails/ProjectDetails.js';
 
 const Layout = () => {
     return (
-        <div className='container-fluid'>
+        <div className='container-fluid '>
             <Navbar/>
             <div className="content">
                 <Routes>

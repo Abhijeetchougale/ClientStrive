@@ -194,11 +194,11 @@ const Change = () => {
   };
 
   return (
-    <>
+    <div>
       <div className="container-fluid">
         <div className="row mt-3">
           <div className="col-md-1"></div>
-          <div className="col-md-10">
+          <div className="col-md-12">
             <div className="card bg-light">
               <div className="card-header bg-info">
                 <div className="row mt-2">
@@ -396,7 +396,7 @@ const Change = () => {
           </Modal>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 const Navbar = () => {
   const onLogout = () => {
     localStorage.removeItem("loginToken");
-
   }
 
   return (

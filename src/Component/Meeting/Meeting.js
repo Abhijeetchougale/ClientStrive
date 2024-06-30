@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
-import { toast } from 'react-toastify';
 import Swal from "sweetalert2";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import Spinner from "react-bootstrap/Spinner";
@@ -78,6 +77,8 @@ const Meeting = () => {
     setErrors((prevErrors) => ({ ...prevErrors, [key]: "" }));
   };
 
+  
+
   const getAllMeetings = async () => {
     setIsLoading(true);
     try {
@@ -99,7 +100,7 @@ const Meeting = () => {
   const getAllMeetingsByProjectId = async () => {
     try {
       const result = await axios.get(
-        "https://freeapi.gerasim.in/api/ClientStrive/GetAllMeetingsByProjectId",
+        "https://freeapi.gerasim.in/api/ClientStrive/GetAllMeetingsByProjectId?projectId=",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
@@ -161,7 +162,6 @@ const Meeting = () => {
   const SaveMeeting = async () => {
     if (validateForm()) {
       try {
-        debugger;
         const result = await axios.post("https://freeapi.gerasim.in/api/ClientStrive/AddUpdateProjectMeeting",
           addUpdateProjectMeeting, {
           headers: {
@@ -169,16 +169,18 @@ const Meeting = () => {
           }
         });
         if (result.data.result) {
-          toast.success("Data saved successfully");
-          // Reset form data after saving
+          Swal.fire(" Meeting add Success!", result.data.data, "success");
+          getAllMeetings();
+          handleClose();
 
         } else {
-          toast.error(result.data.message);
+          alert(result.data.message);
+          getAllMeetings();
         }
       } catch (error) {
-        console.error("Error:", error);
-        toast.error("An error occurred while saving data");
+        console.error("Error saving Meeting:", error);
       }
+      return;
     }
   };
   const editMeeting = (meeting) => {
@@ -266,7 +268,7 @@ const Meeting = () => {
       <div className="container-fluid">
         <div className="row mt-3">
           <div className="col-md-1"></div>
-          <div className="col-md-10">
+          <div className="col-md-12">
             <div className="card bg-light">
               <div className="card-header bg-info">
                 <div className="row mt-2">
@@ -296,7 +298,7 @@ const Meeting = () => {
                       <th>End Time</th>
                       <th>Meeting Medium</th>
                       {/* <th>RecordingUrl</th>
-                                            <th>Meeting Notes</th> */}
+                      <th>Meeting Notes</th> */}
                       <th>Client Person</th>
                       <th>Meeting Title</th>
                       <th>Meeting Status</th>
@@ -377,12 +379,12 @@ const Meeting = () => {
                           <div className="row">
                             <div className="col-md-6">
                               <label>Project Id</label>
-                              <select className='form-select' name="roleId" value={addUpdateProjectMeeting.projectId} onChange={handleChange}>
+                              <select className='form-select' name="projectId" value={addUpdateProjectMeeting.projectId} onChange={handleChange}>
                                 <option>Seletct Project</option>
                                 {
-                                  getmeetingsByProjectId.map((peoject) => {
+                                  getmeetingsByProjectId.map((rol) => {
                                     return (
-                                      <option key={peoject.projectId} value={peoject.projectId}>{peoject.ProjectName}</option>
+                                      <option key={rol.ProjectId} value={rol.ProjectId}>{rol.ProjectName}</option>
                                     )
                                   })
                                 }
@@ -390,11 +392,7 @@ const Meeting = () => {
                             </div>
                             <div className="col-md-6">
                               <label>Meeting Lead By EmpId</label>
-                              <select
-                                name=""
-                                id=""
-                                className="form-control"
-                              ></select>
+                              
                             </div>
                           </div>
                           <div className="row">
@@ -417,7 +415,7 @@ const Meeting = () => {
                             <div className="col-md-6">
                               <label>Satrt Time</label>
                               <input
-                                type="text"
+                                type="time"
                                 value={addUpdateProjectMeeting.startTime}
                                 className="form-control"
                                 onChange={(event) =>
@@ -435,7 +433,7 @@ const Meeting = () => {
                             <div className="col-md-6">
                               <label>End Time</label>
                               <input
-                                type="text"
+                                type="time"
                                 value={addUpdateProjectMeeting.endTime}
                                 className="form-control"
                                 onChange={(event) =>
@@ -582,29 +580,33 @@ const Meeting = () => {
                 </div>
               </Modal.Body>
               <Modal.Footer>
-                <form action="">
-                  {
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-primary m-2"
-                      onClick={SaveMeeting}
-                    >
-                      Add
-                    </button>
-                  }
-                  {
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-warning m-2"
-                      onClick={OnUpdate}
-                    >
-                      Update
-                    </button>
-                  }
-                </form>
-                <button className="btn btn-sm btn-secondary" onClick={onReset}>
+              <div className="col-12 text-center">
+                {addUpdateProjectMeeting.projectId == 0 && (
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-primary m-2"
+                    onClick={SaveMeeting}
+                  >
+                    Add
+                  </button>
+                )}
+                {addUpdateProjectMeeting.projectId != 0 && (
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-warning m-2"
+                    onClick={OnUpdate}
+                  >
+                    Update
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="btn btn-sm btn-secondary"
+                  onClick={onReset}
+                >
                   Reset
                 </button>
+              </div>
               </Modal.Footer>
             </Modal>
           </form>

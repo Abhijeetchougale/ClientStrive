@@ -226,7 +226,7 @@ const Client = () => {
       <div className="container-fluid">
         <div className="row mt-3">
           <div className="col-md-1"></div>
-          <div className="col-md-10">
+          <div className="col-md-12">
             <div className="card bg-light">
               <div className="card-header bg-info">
                 <div className="row mt-2">
@@ -477,7 +477,7 @@ const Client = () => {
             </Modal.Body>
             <Modal.Footer>
               <div className="col-12 text-center">
-                {addUpdateClient.clientId == 0 && (
+                {addUpdateClient.clientId === 0 && (
                   <button
                     type="button"
                     className="btn btn-sm btn-primary m-2"
@@ -486,7 +486,7 @@ const Client = () => {
                     Add
                   </button>
                 )}
-                {addUpdateClient.clientId != 0 && (
+                {addUpdateClient.clientId !== 0 && (
                   <button
                     type="button"
                     className="btn btn-sm btn-warning m-2"
